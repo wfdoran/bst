@@ -68,16 +68,36 @@ bst_insert(bst_node_t *root, int64_t value)
   return node;
 } 
 
+void
+bst_display(const bst_node_t *node, int indent)
+{
+  if (node != NULL) {
+    bst_display(node->left, indent + 1);
+    for (int64_t i = 0; i < indent; i++) {
+      printf("    ");
+    }
+    if (node->count == 1) {
+      printf("%ld\n", node->key);
+    } else {
+      printf("%ld <%ld>\n", node->key, node->count);
+    }
+    bst_display(node->right, indent + 1);
+  }
+}
+
 int 
 main()
 {
   srand48(time(NULL));
   bst_node_t *root = NULL;
 
-  for (int i = 0; i < 100; i++) {
-    uint64_t key = lrand48();
+  for (int i = 0; i < 50; i++) {
+    uint64_t key = lrand48() % 100;
 
     root = bst_insert(root, key);
     printf("<%ld,%ld,%ld>", i,root->depth,root->size);
   }
+  printf("\n\n");
+
+  bst_display(root, 0);
 }
