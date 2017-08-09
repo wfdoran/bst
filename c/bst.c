@@ -15,8 +15,8 @@ typedef struct bst_node_t{
   int64_t depth;
 } bst_node_t;
 
-#define SIZE(x)  (((x) == NULL) ? 0 : x->size)
-#define DEPTH(x) (((x) == NULL) ? 0 : x->depth)
+#define SIZE(x)  (((x) == NULL) ? 0 : (x)->size)
+#define DEPTH(x) (((x) == NULL) ? 0 : (x)->depth)
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 #define SET_PARENT(a,b) do { if ((a) != NULL) {a->parent = b;}} while(0)
 
@@ -34,6 +34,35 @@ bst_display(const bst_node_t *node, int indent)
       printf("%ld <%ld>\n", node->key, node->count);
     }
     bst_display(node->right, indent + 1);
+  }
+}
+
+void
+bst_rank(bst_node_t *root, int64_t key, int64_t rank[3])
+{
+  rank[0] = 0;
+  rank[1] = 0; 
+  rank[2] = 0;
+
+  bst_node_t *node = root;
+  while(true) {
+    if (node == NULL) {
+      return;
+    }
+    if (key == node->key) {
+      rank[0] += SIZE(node->left);
+      rank[1] += node->size;
+      rank[2] += SIZE(node->right);
+      return;
+    }
+
+    if (key < node->key) {
+      rank[2] += node->size - SIZE(node->left);
+      node = node->left;
+    } else {
+      rank[0] += node->size - SIZE(node->right);
+      node = node->right;
+    }
   }
 }
 
@@ -287,4 +316,9 @@ main()
   }
   printf("\n\n");
   printf("%ld\n", root->depth);
+
+  int64_t rank[3];
+  bst_rank(root, 500000, rank);
+  printf("%ld %ld %ld : %ld\n", rank[0], rank[1], rank[2],
+	 rank[0] + rank[1] + rank[2]);
 }
